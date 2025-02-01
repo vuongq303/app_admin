@@ -91,12 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ButtonLogin(
                         maxWidth: maxWidth,
                         onClick: () async {
-                          // showLoading(context, color.whColor);
+                          FocusManager.instance.primaryFocus!.unfocus();
+                          showLoading(context, color.whColor);
                           await viewModel.onSubmitFormLogin(
                               formKey, router, context, isSaveAccount);
-                          // if (context.mounted) {
-                          //   Navigator.of(context).pop();
-                          // }
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
                         },
                         title: 'Đăng nhập',
                         textColor: Colors.white,

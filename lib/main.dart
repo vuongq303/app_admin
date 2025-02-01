@@ -1,6 +1,7 @@
 import 'package:app_admin/services/base.dart';
 import 'package:app_admin/view_models/home_view_model.dart';
 import 'package:app_admin/view_models/login_view_model.dart';
+import 'package:app_admin/view_models/splash_view_model.dart';
 import 'package:app_admin/view_models/styles/my_color.dart';
 import 'package:app_admin/views/router.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (context) => MyColor()),
         Provider(create: (context) => LoginViewModel()),
         Provider(create: (context) => HomeViewModel()),
+        Provider(create: (context) => SplashViewModel()),
         Provider(create: (context) => Base())
       ],
       child: MaterialApp.router(

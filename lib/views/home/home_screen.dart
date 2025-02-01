@@ -1,6 +1,6 @@
-import 'package:app_admin/services/dialog.dart';
 import 'package:app_admin/view_models/home_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,8 +12,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  String _selectedValue = '';
   late HomeViewModel viewModel;
+  String? selectedValue;
 
   final List<Widget> _drawerScreens = [
     Center(child: Text('Home Screen', style: TextStyle(fontSize: 24))),
@@ -27,7 +27,14 @@ class _HomeScreenState extends State<HomeScreen> {
     'Căn hộ đã duyệt'
   ];
 
-  final List<String> listMenu = ['Item 1', 'Item 2', 'Item 3'];
+  final List<String> listMenu = [
+    'Item 1',
+    'Item 2',
+    'Item 3',
+    'Item 8',
+    'Item 7',
+    'Item 6',
+  ];
 
   @override
   void initState() {
@@ -39,9 +46,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final color = viewModel.color;
-    final maxWidth = MediaQuery.of(context).size.width;
-    final taiKhoan = viewModel.taiKhoanSaved;
+    final hoTen = viewModel.hoTenSaved;
     final phanQuyen = viewModel.phanQuyenSaved;
+    final router = GoRouter.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -58,76 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.menu),
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showActionSheet(
-                context: context,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Tìm kiếm căn hộ',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: DropdownMenu(
-                              textStyle: TextStyle(fontSize: 16),
-                              width: maxWidth / 2,
-                              hintText: 'Chọn tên dự án',
-                              initialSelection: _selectedValue,
-                              onSelected: (String? value) {
-                                setState(() {
-                                  _selectedValue = value!;
-                                });
-                              },
-                              dropdownMenuEntries: listMenu
-                                  .map(
-                                    (String value) => DropdownMenuEntry(
-                                      value: value,
-                                      label: value,
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: DropdownMenu(
-                              textStyle: TextStyle(fontSize: 16),
-                              width: maxWidth / 2,
-                              hintText: 'Chọn tên tòa nhà',
-                              initialSelection: _selectedValue,
-                              onSelected: (String? value) {
-                                setState(() {
-                                  _selectedValue = value!;
-                                });
-                              },
-                              dropdownMenuEntries: listMenu
-                                  .map(
-                                    (String value) => DropdownMenuEntry(
-                                      value: value,
-                                      label: value,
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-            icon: Icon(Icons.filter_alt_outlined),
-          ),
-        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -136,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: color.bgColor),
               accountName: ValueListenableBuilder(
-                valueListenable: taiKhoan,
+                valueListenable: hoTen,
                 builder: (context, value, child) => Text(
                   value,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -196,8 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.logout,
               ),
               title: const Text('Đăng xuất'),
-              onTap: () {
-                Navigator.pop(context);
+              onTap: () async {
+                await viewModel.logout();
+                router.go('/login');
               },
             ),
           ],

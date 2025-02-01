@@ -58,36 +58,39 @@ class LoginViewModel {
           'password': passwordInputForm,
         };
 
-        // final data = await http.post(
-        //   Uri.https(base.baseUrl, '/nguoi-dung/dang-nhap'),
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: jsonEncode(dataPost),
-        // );
+        final data = await http.post(
+          Uri.http(base.baseUrl, '/nguoi-dung/dang-nhap'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(dataPost),
+        );
 
-        // Map<String, dynamic> json = jsonDecode(data.body);
-        // final response = json['response'];
-        // final status = json['status'];
+        Map<String, dynamic> json = jsonDecode(data.body);
+        final response = json['response'];
+        final status = json['status'];
 
-        // if (context.mounted) {
-        //   showToast(context, response, ToastificationType.success);
-        // }
+        if (context.mounted) {
+          showToast(context, response, ToastificationType.success);
+        }
 
-        // if (status) {
-        //   final token = json['token'];
-        //   final phanQuyen = json['role'];
-        //   await sharedPreferences.setString('tai-khoan', usernameInputForm);
-        //   await sharedPreferences.setString('phan-quyen', phanQuyen);
-        //   if (isSaveAccount) {
-        //     await sharedPreferences.setString('TOKEN', token);
-        //   }
-        //   router.go('/home');
-        // }
-        router.go('/home');
+        if (status) {
+          final hoTen = json['ho_ten'];
+          final phanQuyen = json['phan_quyen'];
+
+          await sharedPreferences.setString('ho-ten', hoTen);
+          await sharedPreferences.setString('phan-quyen', phanQuyen);
+
+          if (isSaveAccount) {
+            final apiKey = json['api_key'];
+            await sharedPreferences.setString('api-key', apiKey);
+          }
+          router.go('/home');
+        }
         return;
       }
     } catch (e) {
+      logger.e(e);
       if (context.mounted) {
         showToast(
           context,

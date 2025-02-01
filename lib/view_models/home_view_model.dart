@@ -6,14 +6,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeViewModel {
   Logger logger = Logger();
   MyColor color = MyColor();
-  ValueNotifier taiKhoanSaved = ValueNotifier('');
+  ValueNotifier hoTenSaved = ValueNotifier('');
   ValueNotifier phanQuyenSaved = ValueNotifier('');
-  
+
   Future<void> loadDataSaved() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? taiKhoan = prefs.getString('tai-khoan');
+    String? hoTen = prefs.getString('ho-ten');
     String? phanQuyen = prefs.getString('phan-quyen');
-    taiKhoanSaved.value = taiKhoan;
+    hoTenSaved.value = hoTen;
     phanQuyenSaved.value = phanQuyen;
+  }
+
+  Future<void> logout() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove('api-key');
   }
 }
