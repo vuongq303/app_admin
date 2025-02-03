@@ -12,15 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
   late HomeViewModel viewModel;
-  String? tenDuAnSelected;
-  String? tenToaNhaSelected;
-  String? noiThatSelected;
-  String? loaiCanHoSelected;
-  String? huongBanCongSelected;
-  String? soPhongNguSelected;
-  String? trucCanHoSelected;
+  int _selectedIndex = 0;
 
   final List<Widget> _drawerScreens = [
     Center(child: Text('Home Screen', style: TextStyle(fontSize: 24))),
@@ -55,12 +48,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final color = viewModel.color;
+    final router = GoRouter.of(context);
     final hoTen = viewModel.hoTenSaved;
     final phanQuyen = viewModel.phanQuyenSaved;
-    final router = GoRouter.of(context);
+    final tenDuAnSelected = viewModel.tenDuAnSelected;
+    final tenToaNhaSelected = viewModel.tenToaNhaSelected;
+    final noiThatSelected = viewModel.noiThatSelected;
+    final loaiCanHoSelected = viewModel.loaiCanHoSelected;
+    final huongBanCongSelected = viewModel.huongBanCongSelected;
+    final soPhongNguSelected = viewModel.soPhongNguSelected;
+    final trucCanHoSelected = viewModel.trucCanHoSelected;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: color.bgColor,
+        foregroundColor: color.whColor,
         centerTitle: true,
         title: Text(
           _drawerMenu[_selectedIndex],
@@ -71,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
-            icon: Icon(Icons.menu),
+            icon: Icon(Icons.menu, size: 25),
           ),
         ),
         actions: [
@@ -94,7 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(
                             'Tìm kiếm căn hộ',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 20),
                           SingleChildScrollView(
@@ -103,79 +108,44 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 MyDropDown(
                                   listMenu: listMenu,
-                                  selectedValue: tenDuAnSelected,
+                                  valueNotifier: tenDuAnSelected,
                                   title: 'Tên dự án',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      tenDuAnSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: tenToaNhaSelected,
+                                  valueNotifier: tenToaNhaSelected,
                                   listMenu: listMenu,
                                   title: 'Tên tòa nhà',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      tenToaNhaSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: noiThatSelected,
+                                  valueNotifier: noiThatSelected,
                                   listMenu: listMenu,
                                   title: 'Nội thất',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      noiThatSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: loaiCanHoSelected,
+                                  valueNotifier: loaiCanHoSelected,
                                   listMenu: listMenu,
                                   title: 'Loại căn hộ',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      tenDuAnSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: huongBanCongSelected,
+                                  valueNotifier: huongBanCongSelected,
                                   listMenu: listMenu,
                                   title: 'Hướng ban công',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      huongBanCongSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: soPhongNguSelected,
+                                  valueNotifier: soPhongNguSelected,
                                   listMenu: _listPhongNgu,
                                   title: 'Số phòng ngủ',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      soPhongNguSelected = value;
-                                    });
-                                  },
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  selectedValue: trucCanHoSelected,
+                                  valueNotifier: trucCanHoSelected,
                                   listMenu: listMenu,
                                   title: 'Trục căn hộ',
-                                  onChange: (String? value) {
-                                    setState(() {
-                                      trucCanHoSelected = value;
-                                    });
-                                  },
                                 ),
                               ],
                             ),
@@ -191,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     foregroundColor:
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
                                   child: const Text(
                                     'Tìm kiếm',
                                     style: TextStyle(fontSize: 15),
@@ -207,7 +179,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     foregroundColor:
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    setState(() {
+                                      tenDuAnSelected.value = '';
+                                      tenToaNhaSelected.value = '';
+                                      noiThatSelected.value = '';
+                                      loaiCanHoSelected.value = '';
+                                      huongBanCongSelected.value = '';
+                                      soPhongNguSelected.value = '';
+                                      trucCanHoSelected.value = '';
+                                    });
+                                  },
                                   child: const Text(
                                     'Làm mới',
                                     style: TextStyle(fontSize: 15),
@@ -223,8 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               );
             },
-            icon: Icon(Icons.filter_alt_outlined),
+            icon: Icon(Icons.filter_alt_outlined, size: 25),
           ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.sort, size: 25),
+          )
         ],
       ),
       drawer: Drawer(

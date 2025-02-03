@@ -6,8 +6,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeViewModel {
   Logger logger = Logger();
   MyColor color = MyColor();
+
   ValueNotifier hoTenSaved = ValueNotifier('');
   ValueNotifier phanQuyenSaved = ValueNotifier('');
+  ValueNotifier<String?> tenDuAnSelected = ValueNotifier('');
+  ValueNotifier<String?> tenToaNhaSelected = ValueNotifier('');
+  ValueNotifier<String?> noiThatSelected = ValueNotifier('');
+  ValueNotifier<String?> loaiCanHoSelected = ValueNotifier('');
+  ValueNotifier<String?> huongBanCongSelected = ValueNotifier('');
+  ValueNotifier<String?> soPhongNguSelected = ValueNotifier('');
+  ValueNotifier<String?> trucCanHoSelected = ValueNotifier('');
 
   Future<void> loadDataSaved() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
