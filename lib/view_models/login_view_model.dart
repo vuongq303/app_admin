@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:app_admin/services/base.dart';
 import 'package:app_admin/services/toast.dart';
-import 'package:app_admin/view_models/styles/my_color.dart';
+import 'package:app_admin/styles/my_color.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -59,7 +59,7 @@ class LoginViewModel {
         };
 
         final data = await http.post(
-          Uri.http(base.baseUrl, '/nguoi-dung/dang-nhap'),
+          Uri.https(base.baseUrl, '/nguoi-dung/dang-nhap'),
           headers: {
             'Content-Type': 'application/json',
           },

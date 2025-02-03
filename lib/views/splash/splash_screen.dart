@@ -1,5 +1,5 @@
 import 'package:app_admin/view_models/splash_view_model.dart';
-import 'package:app_admin/view_models/styles/my_color.dart';
+import 'package:app_admin/styles/my_color.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';

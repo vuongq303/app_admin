@@ -1,4 +1,4 @@
-import 'package:app_admin/view_models/styles/my_color.dart';
+import 'package:app_admin/styles/my_color.dart';
 import 'package:flutter/material.dart';
 
 class InputLogin extends StatelessWidget {

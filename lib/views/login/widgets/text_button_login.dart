@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:app_admin/view_models/styles/my_color.dart';
+import 'package:app_admin/styles/my_color.dart';
 
 class TextButtonLogin extends StatelessWidget {
   final Function() onClick;

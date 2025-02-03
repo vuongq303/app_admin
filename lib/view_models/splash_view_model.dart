@@ -28,7 +28,7 @@ class SplashViewModel {
       };
 
       final data = await http.post(
-        Uri.http(base.baseUrl, '/auth'),
+        Uri.https(base.baseUrl, '/auth'),
         headers: {
           'Content-Type': 'application/json',
         },

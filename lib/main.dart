@@ -2,7 +2,7 @@ import 'package:app_admin/services/base.dart';
 import 'package:app_admin/view_models/home_view_model.dart';
 import 'package:app_admin/view_models/login_view_model.dart';
 import 'package:app_admin/view_models/splash_view_model.dart';
-import 'package:app_admin/view_models/styles/my_color.dart';
+import 'package:app_admin/styles/my_color.dart';
 import 'package:app_admin/views/router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
