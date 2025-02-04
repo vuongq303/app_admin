@@ -1,28 +1,24 @@
-import 'package:app_admin/view_models/login_view_model.dart';
+import 'package:app_admin/provider/login_provider.dart';
+import 'package:app_admin/provider/styles/styles.dart';
 import 'package:app_admin/views/login/widgets/button_login.dart';
 import 'package:app_admin/views/login/widgets/input_login.dart';
-import 'package:app_admin/widgets/loading_widget.dart';
+import 'package:app_admin/widgets/condition_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final formKey = GlobalKey<FormState>();
-  bool isSaveAccount = false;
+class LoginScreen extends ConsumerWidget {
+  LoginScreen({super.key});
+  final _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = context.read<LoginViewModel>();
-    final color = viewModel.color;
+  Widget build(BuildContext context, WidgetRef ref) {
     final maxWidth = MediaQuery.of(context).size.width;
     final router = GoRouter.of(context);
+    final loginState = ref.watch(loginProvider);
+    final color = ref.watch(stylesProvider);
+    final loginNotifer = ref.read(loginProvider.notifier);
 
     return Scaffold(
       backgroundColor: color.bgColor,
@@ -46,23 +42,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 15),
                 Form(
-                  key: formKey,
+                  key: _formKey,
                   child: Column(
                     children: [
                       InputLogin(
                         color: color,
                         isSecured: false,
                         title: 'Tài khoản',
-                        onSaved: viewModel.onSaveUsernameInputForm,
-                        onValidator: viewModel.onVaidatorUsernameInputForm,
+                        onSaved: loginNotifer.updateUsername,
+                        onValidator: loginNotifer.validateUsername,
                       ),
                       const SizedBox(height: 15),
                       InputLogin(
                         color: color,
                         isSecured: true,
                         title: 'Mật khẩu',
-                        onSaved: viewModel.onSavePasswordInputForm,
-                        onValidator: viewModel.onVaidatorPasswordInputForm,
+                        onSaved: loginNotifer.updatePassword,
+                        onValidator: loginNotifer.validatePassword,
                       ),
                       Row(
                         children: [
@@ -72,12 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               side: BorderSide(color: color.whColor, width: 2),
                               checkColor: color.whColor,
                               activeColor: color.grColor,
-                              value: isSaveAccount,
-                              onChanged: (value) {
-                                setState(() {
-                                  isSaveAccount = !isSaveAccount;
-                                });
-                              },
+                              value: loginState.isSaveAccount,
+                              onChanged: loginNotifer.toggleSaveAccount,
                             ),
                           ),
                           Text(
@@ -88,20 +80,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           )
                         ],
                       ),
-                      ButtonLogin(
-                        maxWidth: maxWidth,
-                        onClick: () async {
-                          FocusManager.instance.primaryFocus!.unfocus();
-                          showLoading(context, color.whColor);
-                          await viewModel.onSubmitFormLogin(
-                              formKey, router, context, isSaveAccount);
-                          if (context.mounted) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        title: 'Đăng nhập',
-                        textColor: Colors.white,
-                        bgColor: color.redOrange,
+                      ConditionWidget(
+                        widgetTrue: LoadingAnimationWidget.fourRotatingDots(
+                          color: color.whColor,
+                          size: 30,
+                        ),
+                        widgetFalse: ButtonLogin(
+                          maxWidth: maxWidth,
+                          onClick: () async {
+                            await loginNotifer.login(_formKey, router, context);
+                          },
+                          title: 'Đăng nhập',
+                          textColor: Colors.white,
+                          bgColor: color.redOrange,
+                        ),
+                        condition: loginState.isLoading,
                       ),
                     ],
                   ),

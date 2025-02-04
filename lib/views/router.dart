@@ -11,7 +11,7 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginScreen(),
+          builder: (context, state) => LoginScreen(),
         ),
         GoRoute(
           path: '/home',

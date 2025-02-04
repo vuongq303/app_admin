@@ -1,3 +1,4 @@
+import 'package:app_admin/provider/home_provider.dart';
 import 'package:flutter/material.dart';
 
 class MyDropDown extends StatelessWidget {
@@ -5,32 +6,29 @@ class MyDropDown extends StatelessWidget {
     super.key,
     required this.listMenu,
     required this.title,
-    required this.valueNotifier,
+    required this.homeProvider,
+    required this.value,
   });
 
-  final ValueNotifier<String?> valueNotifier;
+  final HomeProvider homeProvider;
   final List<String> listMenu;
   final String title;
+  final String? value;
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: valueNotifier,
-      builder: (context, value, child) => DropdownMenu(
-        width: 200,
-        initialSelection: value,
-        menuHeight: 200,
-        onSelected: (String? value) {
-          valueNotifier.value = value;
-        },
-        hintText: title,
-        dropdownMenuEntries: listMenu.map((item) {
-          return DropdownMenuEntry(
-            value: item,
-            label: item,
-          );
-        }).toList(),
-      ),
+    return DropdownMenu(
+      width: 200,
+      initialSelection: value,
+      menuHeight: 200,
+      onSelected: (String? value) => homeProvider.updateState(),
+      hintText: title,
+      dropdownMenuEntries: listMenu.map((item) {
+        return DropdownMenuEntry(
+          value: item,
+          label: item,
+        );
+      }).toList(),
     );
   }
 }

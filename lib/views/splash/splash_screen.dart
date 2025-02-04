@@ -1,51 +1,40 @@
-import 'package:app_admin/view_models/splash_view_model.dart';
-import 'package:app_admin/styles/my_color.dart';
+import 'package:app_admin/provider/splash_provider.dart';
+import 'package:app_admin/views/home/home_screen.dart';
+import 'package:app_admin/views/login/login_screen.dart';
+import 'package:app_admin/widgets/error_widgets.dart';
+import 'package:app_admin/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
-  void initState() {
-    super.initState();
-    authLogin(context);
-  }
-
-  Future<void> authLogin(BuildContext context) async {
-    final viewModel = context.read<SplashViewModel>();
-    final router = GoRouter.of(context);
-    final bool status = await viewModel.authLogin(context);
-    if (status) {
-      router.pushReplacement('/home');
-      return;
-    }
-    router.pushReplacement('/login');
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    ref.read(splashProvider.notifier).authLogin();
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = context.read<MyColor>();
+    final provider = ref.watch(splashProvider);
 
     return Scaffold(
-      body: Container(
-        color: color.bgColor,
-        child: Column(
-          children: [
-            Image.asset('assets/images/connect_home.png'),
-            LoadingAnimationWidget.fourRotatingDots(
-              color: color.whColor,
-              size: 50,
-            ),
-          ],
-        ),
+      body: provider.when(
+        data: (status) {
+          if (status) {
+            return HomeScreen();
+          } else {
+            return LoginScreen();
+          }
+        },
+        error: (error, stackTrace) => ErrorWidgets(),
+        loading: () => const LoadingWidget(),
       ),
     );
   }

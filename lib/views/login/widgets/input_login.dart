@@ -1,4 +1,4 @@
-import 'package:app_admin/styles/my_color.dart';
+import 'package:app_admin/provider/styles/styles.dart';
 import 'package:flutter/material.dart';
 
 class InputLogin extends StatelessWidget {
@@ -10,7 +10,7 @@ class InputLogin extends StatelessWidget {
     required this.onSaved,
     required this.onValidator,
   });
-  final MyColor color;
+  final Styles color;
   final bool isSecured;
   final String title;
   final void Function(String?) onSaved;

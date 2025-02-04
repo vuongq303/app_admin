@@ -1,63 +1,49 @@
-import 'package:app_admin/view_models/home_view_model.dart';
+import 'package:app_admin/provider/home_provider.dart';
+import 'package:app_admin/provider/styles/styles.dart';
 import 'package:app_admin/views/home/widgets/my_drop_down.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late HomeViewModel viewModel;
-  int _selectedIndex = 0;
-
-  final List<Widget> _drawerScreens = [
-    Center(child: Text('Home Screen', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Settings Screen', style: TextStyle(fontSize: 24))),
-    Center(child: Text('About Screen', style: TextStyle(fontSize: 24))),
-  ];
-
-  final List<String> _drawerMenu = [
-    'Data nguồn',
-    'Căn hộ đã gửi',
-    'Căn hộ đã duyệt'
-  ];
-
-  final List<String> listMenu = [
-    'Item 1',
-    'Item 2',
-    'Item 3',
-    'Item 8',
-    'Item 7',
-    'Item 6',
-  ];
-
-  final List<String> _listPhongNgu = ['1', '2', '3', '4', '5', '6'];
-
-  @override
-  void initState() {
-    viewModel = context.read<HomeViewModel>();
-    viewModel.loadDataSaved();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = viewModel.color;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeProvider);
+    final homeNotifier = ref.read(homeProvider.notifier);
+    final color = ref.watch(stylesProvider);
     final router = GoRouter.of(context);
-    final hoTen = viewModel.hoTenSaved;
-    final phanQuyen = viewModel.phanQuyenSaved;
-    final tenDuAnSelected = viewModel.tenDuAnSelected;
-    final tenToaNhaSelected = viewModel.tenToaNhaSelected;
-    final noiThatSelected = viewModel.noiThatSelected;
-    final loaiCanHoSelected = viewModel.loaiCanHoSelected;
-    final huongBanCongSelected = viewModel.huongBanCongSelected;
-    final soPhongNguSelected = viewModel.soPhongNguSelected;
-    final trucCanHoSelected = viewModel.trucCanHoSelected;
+    homeNotifier.loadDataSaved();
+
+    final List<String> listPhongNgu = ['1', '2', '3', '4', '5', '6'];
+
+    final List<Widget> drawerScreens = [
+      const Center(
+        child: Text('Home Screen', style: TextStyle(fontSize: 24)),
+      ),
+      const Center(
+        child: Text('Settings Screen', style: TextStyle(fontSize: 24)),
+      ),
+      const Center(
+        child: Text('About Screen', style: TextStyle(fontSize: 24)),
+      ),
+    ];
+
+    final List<String> drawerMenu = [
+      'Data nguồn',
+      'Căn hộ đã gửi',
+      'Căn hộ đã duyệt'
+    ];
+
+    final List<String> listMenu = [
+      'Item 1',
+      'Item 2',
+      'Item 3',
+      'Item 8',
+      'Item 7',
+      'Item 6'
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -65,14 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: color.whColor,
         centerTitle: true,
         title: Text(
-          _drawerMenu[_selectedIndex],
+          drawerMenu[homeState.selectedIndex],
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         leading: Builder(
           builder: (context) => IconButton(
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+            onPressed: () => Scaffold.of(context).openDrawer(),
             icon: Icon(Icons.menu, size: 25),
           ),
         ),
@@ -107,45 +91,52 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 MyDropDown(
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
-                                  valueNotifier: tenDuAnSelected,
+                                  value: homeState.tenDuAn,
                                   title: 'Tên dự án',
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: tenToaNhaSelected,
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
                                   title: 'Tên tòa nhà',
+                                  value: homeState.tenToaNha,
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: noiThatSelected,
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
                                   title: 'Nội thất',
+                                  value: homeState.noiThat,
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: loaiCanHoSelected,
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
                                   title: 'Loại căn hộ',
+                                  value: homeState.loaiCanHo,
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: huongBanCongSelected,
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
                                   title: 'Hướng ban công',
+                                  value: homeState.huongBanCong,
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: soPhongNguSelected,
-                                  listMenu: _listPhongNgu,
+                                  homeProvider: homeNotifier,
+                                  listMenu: listPhongNgu,
                                   title: 'Số phòng ngủ',
+                                  value: homeState.soPhongNgu,
                                 ),
                                 const SizedBox(width: 10),
                                 MyDropDown(
-                                  valueNotifier: trucCanHoSelected,
+                                  homeProvider: homeNotifier,
                                   listMenu: listMenu,
                                   title: 'Trục căn hộ',
+                                  value: homeState.trucCanHo,
                                 ),
                               ],
                             ),
@@ -179,17 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     foregroundColor:
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      tenDuAnSelected.value = '';
-                                      tenToaNhaSelected.value = '';
-                                      noiThatSelected.value = '';
-                                      loaiCanHoSelected.value = '';
-                                      huongBanCongSelected.value = '';
-                                      soPhongNguSelected.value = '';
-                                      trucCanHoSelected.value = '';
-                                    });
-                                  },
+                                  onPressed: () {},
                                   child: const Text(
                                     'Làm mới',
                                     style: TextStyle(fontSize: 15),
@@ -219,59 +200,37 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: color.bgColor),
-              accountName: ValueListenableBuilder(
-                valueListenable: hoTen,
-                builder: (context, value, child) => Text(
-                  value,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
+              accountName: Text(
+                homeState.hoTen,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              accountEmail: ValueListenableBuilder(
-                valueListenable: phanQuyen,
-                builder: (context, value, child) => Text(
-                  value,
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              currentAccountPicture: Icon(
-                Icons.person,
-                size: 60,
-                color: color.grColor,
-              ),
+              accountEmail: Text(homeState.phanQuyen,
+                  style: const TextStyle(fontSize: 16)),
+              currentAccountPicture:
+                  Icon(Icons.person, size: 60, color: color.grColor),
             ),
             ListTile(
-              leading: Icon(
-                Icons.business_outlined,
-              ),
+              leading: const Icon(Icons.business_outlined),
               title: const Text('Data nguồn'),
               onTap: () {
-                setState(() {
-                  _selectedIndex = 0;
-                });
+                homeNotifier.updateState(selectedIndex: 0);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(
-                Icons.send,
-              ),
+              leading: const Icon(Icons.send),
               title: const Text('Căn hộ đã gửi'),
               onTap: () {
-                setState(() {
-                  _selectedIndex = 1;
-                });
+                homeNotifier.updateState(selectedIndex: 1);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(
-                Icons.call_received,
-              ),
+              leading: const Icon(Icons.call_received),
               title: const Text('Căn hộ đã duyệt'),
               onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
+                homeNotifier.updateState(selectedIndex: 2);
                 Navigator.pop(context);
               },
             ),
@@ -281,17 +240,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               title: const Text('Đăng xuất'),
               onTap: () async {
-                await viewModel.logout();
+                await homeNotifier.logout();
                 router.go('/login');
               },
             ),
           ],
         ),
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _drawerScreens,
-      ),
+      body: drawerScreens[homeState.selectedIndex],
     );
   }
 }
