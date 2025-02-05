@@ -1,4 +1,3 @@
-import 'package:app_admin/provider/home_provider.dart';
 import 'package:flutter/material.dart';
 
 class MyDropDown extends StatelessWidget {
@@ -6,12 +5,12 @@ class MyDropDown extends StatelessWidget {
     super.key,
     required this.listMenu,
     required this.title,
-    required this.homeProvider,
     required this.value,
+    required this.onChange,
   });
 
-  final HomeProvider homeProvider;
-  final List<String> listMenu;
+  final List<dynamic> listMenu;
+  final Function(dynamic) onChange;
   final String title;
   final String? value;
 
@@ -21,7 +20,7 @@ class MyDropDown extends StatelessWidget {
       width: 200,
       initialSelection: value,
       menuHeight: 200,
-      onSelected: (String? value) => homeProvider.updateState(),
+      onSelected: onChange,
       hintText: title,
       dropdownMenuEntries: listMenu.map((item) {
         return DropdownMenuEntry(

@@ -1,9 +1,11 @@
 import 'package:app_admin/provider/home_provider.dart';
 import 'package:app_admin/provider/styles/styles.dart';
 import 'package:app_admin/views/home/widgets/my_drop_down.dart';
+import 'package:app_admin/widgets/error_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -12,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
+    final menuNotifer = ref.watch(menuProvider);
     final color = ref.watch(stylesProvider);
     final router = GoRouter.of(context);
     homeNotifier.loadDataSaved();
@@ -34,15 +37,6 @@ class HomeScreen extends ConsumerWidget {
       'Data nguồn',
       'Căn hộ đã gửi',
       'Căn hộ đã duyệt'
-    ];
-
-    final List<String> listMenu = [
-      'Item 1',
-      'Item 2',
-      'Item 3',
-      'Item 8',
-      'Item 7',
-      'Item 6'
     ];
 
     return Scaffold(
@@ -86,59 +80,83 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  value: homeState.tenDuAn,
-                                  title: 'Tên dự án',
+                          menuNotifer.when(
+                            data: (response) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    MyDropDown(
+                                      onChange:
+                                          homeNotifier.tenDuAnUpdateSelection,
+                                      listMenu: ref.watch(listTenDuAnProvider),
+                                      value: homeState.ten_du_an,
+                                      title: 'Tên dự án',
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) =>
+                                          homeNotifier.updateSelection(
+                                              value, 'Tên tòa nhà'),
+                                      listMenu: ref.watch(listToaNhaProvider),
+                                      title: 'Tên tòa nhà',
+                                      value: homeState.ten_toa_nha,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) => homeNotifier
+                                          .updateSelection(value, 'Nội thất'),
+                                      listMenu: ref.watch(listNoiThatProvider),
+                                      title: 'Nội thất',
+                                      value: homeState.noi_that,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) =>
+                                          homeNotifier.updateSelection(
+                                              value, 'Loại căn hộ'),
+                                      listMenu:
+                                          ref.watch(listLoaiCanHoProvider),
+                                      title: 'Loại căn hộ',
+                                      value: homeState.loai_can_ho,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) =>
+                                          homeNotifier.updateSelection(
+                                              value, 'Hướng ban công'),
+                                      listMenu:
+                                          ref.watch(listHuongCanHoProvider),
+                                      title: 'Hướng ban công',
+                                      value: homeState.huong_can_ho,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) =>
+                                          homeNotifier.updateSelection(
+                                              value, 'Số phòng ngủ'),
+                                      listMenu: listPhongNgu,
+                                      title: 'Số phòng ngủ',
+                                      value: homeState.so_phong_ngu,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    MyDropDown(
+                                      onChange: (value) =>
+                                          homeNotifier.updateSelection(
+                                              value, 'Trục căn hộ'),
+                                      listMenu: ref.watch(listTrucCanHoProvider),
+                                      title: 'Trục căn hộ',
+                                      value: homeState.truc_can_ho,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  title: 'Tên tòa nhà',
-                                  value: homeState.tenToaNha,
-                                ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  title: 'Nội thất',
-                                  value: homeState.noiThat,
-                                ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  title: 'Loại căn hộ',
-                                  value: homeState.loaiCanHo,
-                                ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  title: 'Hướng ban công',
-                                  value: homeState.huongBanCong,
-                                ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listPhongNgu,
-                                  title: 'Số phòng ngủ',
-                                  value: homeState.soPhongNgu,
-                                ),
-                                const SizedBox(width: 10),
-                                MyDropDown(
-                                  homeProvider: homeNotifier,
-                                  listMenu: listMenu,
-                                  title: 'Trục căn hộ',
-                                  value: homeState.trucCanHo,
-                                ),
-                              ],
+                              );
+                            },
+                            error: (error, stackTrace) => ErrorWidgets(),
+                            loading: () =>
+                                LoadingAnimationWidget.fourRotatingDots(
+                              color: color.bgColor,
+                              size: 30,
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -152,8 +170,9 @@ class HomeScreen extends ConsumerWidget {
                                     foregroundColor:
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
+                                  onPressed: () async {
+                                    await homeNotifier.submitSelection();
+                                    // Navigator.of(context).pop();
                                   },
                                   child: const Text(
                                     'Tìm kiếm',
@@ -170,7 +189,10 @@ class HomeScreen extends ConsumerWidget {
                                     foregroundColor:
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    homeNotifier.resetSelection();
+                                    // Navigator.of(context).pop();
+                                  },
                                   child: const Text(
                                     'Làm mới',
                                     style: TextStyle(fontSize: 15),
