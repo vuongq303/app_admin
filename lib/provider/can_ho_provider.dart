@@ -44,6 +44,36 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
   }
 }
 
+Future<Map<String, dynamic>> guiYeuCau(int id, Ref ref) async {
+  Logger logger = Logger();
+
+  try {
+    final base = ref.watch(baseProvider);
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    final apiKey = sharedPreferences.getString('api-key');
+
+    final response = await http.post(
+      Uri.https(base.baseUrl, '/yeu-cau/gui-yeu-cau'),
+      headers: {
+        'Cookie': 'TOKEN=$apiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'can_ho': id.toString()}),
+    );
+
+    final responseData = jsonDecode(response.body);
+    return responseData;
+  } catch (e) {
+    logger.e(e);
+    return {'status': false, 'response': 'Lỗi kết nối'};
+  }
+}
+
+final yeuCauProvider = FutureProvider.family.autoDispose<Map<String, dynamic>, int>(
+  (ref, id) => guiYeuCau(id, ref),
+);
+
 final canHoProvider =
     StateNotifierProvider<CanHoProvider, AsyncValue<List<CanHoModel>>>(
   (ref) => CanHoProvider(ref),

@@ -1,10 +1,17 @@
+import 'package:app_admin/provider/base/base.dart';
+import 'package:app_admin/provider/can_ho_provider.dart';
 import 'package:app_admin/provider/styles/styles.dart';
+import 'package:app_admin/services/toast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:app_admin/models/can_ho_model.dart';
 import 'package:app_admin/widgets/text_bold_part.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+import 'package:toastification/toastification.dart';
 
 class CanHoItem extends ConsumerWidget {
   const CanHoItem({super.key, required this.canHo, required this.index});
@@ -14,6 +21,7 @@ class CanHoItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = ref.watch(stylesProvider);
+    final base = ref.watch(baseProvider);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -59,7 +67,58 @@ class CanHoItem extends ConsumerWidget {
           Row(
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  final listImage = canHo.hinh_anh.split(',');
+                  if (listImage[0].isEmpty) return;
+                  final listImageUrl = List.from(
+                    listImage.map(
+                      (img) =>
+                          Uri.https(base.baseUrl, '/can-ho/${canHo.id}/$img')
+                              .toString(),
+                    ),
+                  );
+                  showDialog(
+                    context: context,
+                    builder: (context) => Stack(
+                      children: [
+                        PhotoViewGallery.builder(
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          builder: (BuildContext context, int index) {
+                            return PhotoViewGalleryPageOptions(
+                              imageProvider: NetworkImage(listImageUrl[index]),
+                              initialScale:
+                                  PhotoViewComputedScale.contained * 1,
+                              heroAttributes:
+                                  PhotoViewHeroAttributes(tag: index),
+                            );
+                          },
+                          itemCount: listImageUrl.length,
+                          loadingBuilder: (context, event) => Center(
+                            child: LoadingAnimationWidget.fourRotatingDots(
+                              color: color.bgColor,
+                              size: 50,
+                            ),
+                          ),
+                          onPageChanged: (int? num) {},
+                        ),
+                        Positioned(
+                          right: 15,
+                          top: 15,
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              size: 25,
+                              color: color.whColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   padding: WidgetStatePropertyAll(
                     const EdgeInsets.symmetric(horizontal: 30),
@@ -75,7 +134,43 @@ class CanHoItem extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => Center(
+                      child: LoadingAnimationWidget.fourRotatingDots(
+                        color: color.bgColor,
+                        size: 30,
+                      ),
+                    ),
+                  );
+                  try {
+                    final response =
+                        await ref.read(yeuCauProvider(canHo.id).future);
+                    if (response['status']) {
+                      if (context.mounted) {
+                        showToast(context, response['response'],
+                            ToastificationType.success);
+                      }
+                      return;
+                    }
+
+                    if (context.mounted) {
+                      showToast(context, response['response'],
+                          ToastificationType.error);
+                    }
+                  } catch (error) {
+                    if (context.mounted) {
+                      showToast(
+                          context, 'Có lỗi xảy ra', ToastificationType.error);
+                    }
+                  } finally {
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  }
+                },
                 style: ButtonStyle(
                   padding: WidgetStatePropertyAll(
                     const EdgeInsets.symmetric(horizontal: 40),
