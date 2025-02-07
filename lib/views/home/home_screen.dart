@@ -1,5 +1,8 @@
 import 'package:app_admin/provider/home_provider.dart';
 import 'package:app_admin/provider/styles/styles.dart';
+import 'package:app_admin/views/home/widgets/can_ho.dart';
+import 'package:app_admin/views/home/widgets/can_ho_da_duyet.dart';
+import 'package:app_admin/views/home/widgets/can_ho_da_gui.dart';
 import 'package:app_admin/views/home/widgets/my_drop_down.dart';
 import 'package:app_admin/widgets/error_widgets.dart';
 import 'package:flutter/material.dart';
@@ -22,15 +25,9 @@ class HomeScreen extends ConsumerWidget {
     final List<String> listPhongNgu = ['1', '2', '3', '4', '5', '6'];
 
     final List<Widget> drawerScreens = [
-      const Center(
-        child: Text('Home Screen', style: TextStyle(fontSize: 24)),
-      ),
-      const Center(
-        child: Text('Settings Screen', style: TextStyle(fontSize: 24)),
-      ),
-      const Center(
-        child: Text('About Screen', style: TextStyle(fontSize: 24)),
-      ),
+      const CanHo(),
+      const CanHoDaGui(),
+      const CanHoDaDuyet(),
     ];
 
     final List<String> drawerMenu = [
@@ -144,7 +141,8 @@ class HomeScreen extends ConsumerWidget {
                                       onChange: (value) =>
                                           homeNotifier.updateSelection(
                                               value, 'Trục căn hộ'),
-                                      listMenu: ref.watch(listTrucCanHoProvider),
+                                      listMenu:
+                                          ref.watch(listTrucCanHoProvider),
                                       title: 'Trục căn hộ',
                                       value: homeState.truc_can_ho,
                                     ),
@@ -171,8 +169,8 @@ class HomeScreen extends ConsumerWidget {
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
                                   onPressed: () async {
+                                    Navigator.of(context).pop();
                                     await homeNotifier.submitSelection();
-                                    // Navigator.of(context).pop();
                                   },
                                   child: const Text(
                                     'Tìm kiếm',
@@ -190,8 +188,8 @@ class HomeScreen extends ConsumerWidget {
                                         WidgetStatePropertyAll(color.whColor),
                                   ),
                                   onPressed: () {
+                                    Navigator.of(context).pop();
                                     homeNotifier.resetSelection();
-                                    // Navigator.of(context).pop();
                                   },
                                   child: const Text(
                                     'Làm mới',

@@ -110,19 +110,19 @@ class HomeProvider extends StateNotifier<HomeState> {
   }
 
   void tenDuAnUpdateSelection(selection) {
-    state = state.copyWith(ten_toa_nha: selection);
+    state = state.copyWith(ten_du_an: selection);
+
+    // final listTenToaNha = ref
+    //     .watch(menuProvider)
+    //     .value?['toa_nha']
+    //     .where((item) => item['ten_du_an'].toString() == selection);
+
+    // ref.read(listToaNhaProvider.notifier).state =
+    //     List.from(listTenToaNha.map((item) => item['ten_toa_nha'].toString()));
   }
 
   void resetSelection() {
-    state = HomeState(
-      ten_du_an: '',
-      ten_toa_nha: '',
-      noi_that: '',
-      loai_can_ho: '',
-      huong_can_ho: '',
-      so_phong_ngu: '',
-      truc_can_ho: '',
-    );
+    state = HomeState();
   }
 
   Future<void> submitSelection() async {
@@ -164,8 +164,22 @@ final menuProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   return getListMenu(ref);
 });
 
-final listToaNhaProvider = StateProvider<List<String>>((ref) => []);
-final listTenDuAnProvider = StateProvider<List<String>>((ref) => []);
+final listToaNhaProvider = StateProvider<List<dynamic>>((ref) =>
+    ref
+        .watch(menuProvider)
+        .value?['toa_nha']
+        .map<String>((item) => item['ten_toa_nha'].toString())
+        .toList() ??
+    []);
+
+final listTenDuAnProvider = StateProvider<List<String>>((ref) =>
+    ref
+        .watch(menuProvider)
+        .value?['toa_nha']
+        .map<String>((item) => item['ten_du_an'].toString())
+        .toSet()
+        .toList() ??
+    []);
 
 final listNoiThatProvider = Provider<List<String>>((ref) =>
     ref

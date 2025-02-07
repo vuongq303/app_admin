@@ -45,7 +45,6 @@ class SplashProvider extends StateNotifier<AsyncValue<bool>> {
   }
 }
 
-final splashProvider =
-    StateNotifierProvider<SplashProvider, AsyncValue<bool>>((ref) {
-  return SplashProvider(ref);
-});
+final splashProvider = StateNotifierProvider<SplashProvider, AsyncValue<bool>>(
+  (ref) => SplashProvider(ref),
+);
