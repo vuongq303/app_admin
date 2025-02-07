@@ -1,7 +1,6 @@
 import 'package:app_admin/provider/base/base.dart';
 import 'package:app_admin/provider/can_ho_provider.dart';
 import 'package:app_admin/provider/styles/styles.dart';
-import 'package:app_admin/services/download_image.dart';
 import 'package:app_admin/services/toast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -35,10 +34,18 @@ class CanHoItem extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextBoldPart(title: 'STT: ', bold: (index + 1).toString()),
-          TextBoldPart(
-            title: 'Mã căn hộ: ',
-            bold:
-                '${canHo.ten_toa_nha}-${canHo.ma_can_ho == '' ? 'x' : canHo.ma_can_ho}${canHo.truc_can_ho}',
+          Row(
+            children: [
+              Text('Mã căn hộ: ', style: TextStyle(fontSize: 15)),
+              Container(
+                padding: const EdgeInsets.all(2),
+                color: color.convertColor(canHo.danh_dau),
+                child: Text(
+                  '${canHo.ten_toa_nha}-${canHo.ma_can_ho == '' ? 'x' : canHo.ma_can_ho}${canHo.truc_can_ho}',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
           TextBoldPart(
             title: 'Chủ căn hộ: ',
@@ -130,6 +137,7 @@ class CanHoItem extends ConsumerWidget {
                 ),
                 child: Text('Hình ảnh'),
               ),
+              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () async {
                   showDialog(
@@ -168,29 +176,29 @@ class CanHoItem extends ConsumerWidget {
                 ),
                 child: Text('Yêu cầu'),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  final listImage = canHo.hinh_anh.split(',');
-                  if (listImage[0].isEmpty) return;
-                  final List<String> listImageUrl = List.from(
-                    listImage.map(
-                      (img) =>
-                          Uri.https(base.baseUrl, '/can-ho/${canHo.id}/$img')
-                              .toString(),
-                    ),
-                  );
-                  final response = await ref
-                      .read(downloadImageProvider(listImageUrl).future);
-                  if (context.mounted) {
-                    showToast(context, response, ToastificationType.success);
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(color.blColor),
-                  foregroundColor: WidgetStatePropertyAll(color.whColor),
-                ),
-                child: Text('Tải ảnh xuống'),
-              ),
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     final listImage = canHo.hinh_anh.split(',');
+              //     if (listImage[0].isEmpty) return;
+              //     final List<String> listImageUrl = List.from(
+              //       listImage.map(
+              //         (img) =>
+              //             Uri.https(base.baseUrl, '/can-ho/${canHo.id}/$img')
+              //                 .toString(),
+              //       ),
+              //     );
+              //     final response = await ref
+              //         .read(downloadImageProvider(listImageUrl).future);
+              //     if (context.mounted) {
+              //       showToast(context, response, ToastificationType.success);
+              //     }
+              //   },
+              //   style: ButtonStyle(
+              //     backgroundColor: WidgetStatePropertyAll(color.blColor),
+              //     foregroundColor: WidgetStatePropertyAll(color.whColor),
+              //   ),
+              //   child: Text('Tải ảnh xuống'),
+              // ),
             ],
           ),
         ],

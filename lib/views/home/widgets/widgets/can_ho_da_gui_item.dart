@@ -30,10 +30,18 @@ class CanHoDaGuiItem extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextBoldPart(title: 'STT: ', bold: (index + 1).toString()),
-          TextBoldPart(
-            title: 'Mã căn hộ: ',
-            bold:
-                '${canHo.ten_toa_nha}-${canHo.ma_can_ho == '' ? 'x' : canHo.ma_can_ho}${canHo.truc_can_ho}',
+          Row(
+            children: [
+              Text('Mã căn hộ: ', style: TextStyle(fontSize: 15)),
+              Container(
+                padding: const EdgeInsets.all(2),
+                color: color.convertColor(canHo.danh_dau),
+                child: Text(
+                  '${canHo.ten_toa_nha}-${canHo.ma_can_ho == '' ? 'x' : canHo.ma_can_ho}${canHo.truc_can_ho}',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
           TextBoldPart(
             title: 'Chủ căn hộ: ',
