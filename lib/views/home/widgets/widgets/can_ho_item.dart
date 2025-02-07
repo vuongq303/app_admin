@@ -148,27 +148,21 @@ class CanHoItem extends ConsumerWidget {
                   try {
                     final response =
                         await ref.read(yeuCauProvider(canHo.id).future);
+                    if (!context.mounted) return;
                     if (response['status']) {
-                      if (context.mounted) {
-                        showToast(context, response['response'],
-                            ToastificationType.success);
-                      }
+                      showToast(context, response['response'],
+                          ToastificationType.success);
+
                       return;
                     }
 
-                    if (context.mounted) {
-                      showToast(context, response['response'],
-                          ToastificationType.error);
-                    }
+                    showToast(context, response['response'],
+                        ToastificationType.error);
                   } catch (error) {
-                    if (context.mounted) {
-                      showToast(
-                          context, 'Có lỗi xảy ra', ToastificationType.error);
-                    }
+                    showToast(
+                        context, 'Có lỗi xảy ra', ToastificationType.error);
                   } finally {
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                    }
+                    Navigator.pop(context);
                   }
                 },
                 style: ButtonStyle(

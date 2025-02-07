@@ -142,6 +142,7 @@ final homeProvider = StateNotifierProvider<HomeProvider, HomeState>((ref) {
 Future<Map<String, dynamic>> getListMenu(Ref ref) async {
   try {
     final base = ref.watch(baseProvider);
+    Logger logger = Logger();
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final apiKey = sharedPreferences.getString('api-key');
@@ -150,7 +151,7 @@ Future<Map<String, dynamic>> getListMenu(Ref ref) async {
       Uri.https(base.baseUrl, "/thong-tin-du-an"),
       headers: {'Cookie': 'TOKEN=$apiKey'},
     );
-
+    logger.d('call api get list menu');
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
