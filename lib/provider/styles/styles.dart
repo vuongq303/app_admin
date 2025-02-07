@@ -10,6 +10,7 @@ class Styles {
   Color get bgColor => const Color.fromARGB(255, 43, 80, 160);
   Color get whColor => const Color.fromARGB(255, 255, 255, 255);
   Color get grColor => const Color.fromARGB(255, 169, 196, 108);
+  Color get blColor => const Color.fromARGB(255, 30, 144, 255);
 }
 
 final stylesProvider = Provider<Styles>((ref) => Styles());

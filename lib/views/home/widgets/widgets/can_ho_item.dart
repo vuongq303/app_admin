@@ -1,6 +1,7 @@
 import 'package:app_admin/provider/base/base.dart';
 import 'package:app_admin/provider/can_ho_provider.dart';
 import 'package:app_admin/provider/styles/styles.dart';
+import 'package:app_admin/services/download_image.dart';
 import 'package:app_admin/services/toast.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -64,7 +65,7 @@ class CanHoItem extends ConsumerWidget {
             '- ${canHo.nguoi_cap_nhat} đã cập nhật ngày ${DateFormat("dd/MM/yyyy").format(canHo.ngay_cap_nhat)}',
           ),
           const SizedBox(height: 10),
-          Row(
+          Wrap(
             children: [
               ElevatedButton(
                 onPressed: () {
@@ -120,9 +121,6 @@ class CanHoItem extends ConsumerWidget {
                   );
                 },
                 style: ButtonStyle(
-                  padding: WidgetStatePropertyAll(
-                    const EdgeInsets.symmetric(horizontal: 30),
-                  ),
                   backgroundColor: WidgetStatePropertyAll(
                     canHo.hinh_anh == '' ? color.bgColor : color.yellow,
                   ),
@@ -132,7 +130,6 @@ class CanHoItem extends ConsumerWidget {
                 ),
                 child: Text('Hình ảnh'),
               ),
-              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () async {
                   showDialog(
@@ -166,13 +163,33 @@ class CanHoItem extends ConsumerWidget {
                   }
                 },
                 style: ButtonStyle(
-                  padding: WidgetStatePropertyAll(
-                    const EdgeInsets.symmetric(horizontal: 40),
-                  ),
                   backgroundColor: WidgetStatePropertyAll(color.redOrange),
                   foregroundColor: WidgetStatePropertyAll(color.whColor),
                 ),
                 child: Text('Yêu cầu'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final listImage = canHo.hinh_anh.split(',');
+                  if (listImage[0].isEmpty) return;
+                  final List<String> listImageUrl = List.from(
+                    listImage.map(
+                      (img) =>
+                          Uri.https(base.baseUrl, '/can-ho/${canHo.id}/$img')
+                              .toString(),
+                    ),
+                  );
+                  final response = await ref
+                      .read(downloadImageProvider(listImageUrl).future);
+                  if (context.mounted) {
+                    showToast(context, response, ToastificationType.success);
+                  }
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(color.blColor),
+                  foregroundColor: WidgetStatePropertyAll(color.whColor),
+                ),
+                child: Text('Tải ảnh xuống'),
               ),
             ],
           ),
