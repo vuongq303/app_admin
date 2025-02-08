@@ -7,6 +7,7 @@ import 'package:app_admin/widgets/error_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:loadmore/loadmore.dart';
 
 class CanHo extends ConsumerStatefulWidget {
   const CanHo({super.key});
@@ -20,7 +21,7 @@ class _CanHoState extends ConsumerState<CanHo> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      ref.read(canHoProvider.notifier).getData(50, 0);
+      ref.read(canHoProvider.notifier).getData();
     });
   }
 
@@ -217,11 +218,17 @@ class _CanHoState extends ConsumerState<CanHo> {
         Expanded(
           child: canHoNotifer.when(
             data: (data) {
-              return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) => CanHoItem(
-                  canHo: data[index],
-                  index: index,
+              return LoadMore(
+                onLoadMore: () async {
+                  ref.read(canHoProvider.notifier).loadMore();
+                  return true;
+                },
+                child: ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) => CanHoItem(
+                    canHo: data[index],
+                    index: index,
+                  ),
                 ),
               );
             },
