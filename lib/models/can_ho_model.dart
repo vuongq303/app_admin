@@ -72,6 +72,13 @@ class CanHoModel {
   }
 
   factory CanHoModel.fromMap(Map<String, dynamic> map) {
+    DateTime ngayCapNhat;
+    try {
+      ngayCapNhat = DateTime.parse(map['ngay_cap_nhat'] ?? "");
+    } catch (e) {
+      ngayCapNhat = DateTime(0000, 01, 01);
+    }
+
     return CanHoModel(
       id: map['id'] ?? 0,
       gia_ban: map['gia_ban'] ?? 0,
@@ -80,8 +87,8 @@ class CanHoModel {
       ma_can_ho: map['ma_can_ho'] ?? "",
       ten_du_an: map['ten_du_an'] ?? "",
       dien_tich: map['dien_tich'] ?? "",
-      so_phong_ngu: map['so_phong_ngu'] ?? "",
-      so_phong_tam: map['so_phong_tam'] ?? "",
+      so_phong_ngu: map['so_phong_ngu'] ?? 0,
+      so_phong_tam: map['so_phong_tam'] ?? 0,
       huong_can_ho: map['huong_can_ho'] ?? "",
       loai_can_ho: map['loai_can_ho'] ?? "",
       noi_that: map['noi_that'] ?? "",
@@ -93,7 +100,7 @@ class CanHoModel {
       chu_can_ho: map['chu_can_ho'] ?? "",
       so_dien_thoai: map['so_dien_thoai'] ?? "",
       danh_dau: map['danh_dau'] ?? "",
-      ngay_cap_nhat: DateTime.parse(map['ngay_cap_nhat'] ?? ""),
+      ngay_cap_nhat: ngayCapNhat,
     );
   }
 }
