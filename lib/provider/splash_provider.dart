@@ -18,12 +18,14 @@ class SplashProvider extends StateNotifier<AsyncValue<bool>> {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       String? apiKey = sharedPreferences.getString('api-key');
-
+      bool? isSaved = sharedPreferences.getBool('is-saved') ?? false;
       await Future.delayed(const Duration(seconds: 1));
-      if (apiKey == null) {
+
+      if (!isSaved) {
         state = const AsyncValue.data(false);
         return;
       }
+
       final auth = {
         'api_key': apiKey,
       };

@@ -14,6 +14,8 @@ class Base {
         'Giá đến': 'gia_den',
         'Lọc giá': 'loc_gia',
       };
+
+  List<String> get authList => ['Admin', 'Sale', 'Quản lý', 'CSKH'];
 }
 
 final baseProvider = Provider<Base>((ref) => Base());

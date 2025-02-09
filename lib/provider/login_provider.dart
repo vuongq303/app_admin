@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:app_admin/provider/base/base.dart';
 import 'package:app_admin/services/toast.dart';
+import 'package:bcrypt/bcrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -71,7 +72,6 @@ class LoginNotifier extends StateNotifier<LoginState> {
   Future<void> login(GlobalKey<FormState> formKey, GoRouter router,
       BuildContext context) async {
     final base = ref.watch(baseProvider);
-
     if (!formKey.currentState!.validate()) return;
     formKey.currentState!.save();
 
@@ -105,10 +105,16 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (status) {
         await sharedPreferences.setString('ho-ten', json['ho_ten']);
         await sharedPreferences.setString('phan-quyen', json['phan_quyen']);
-
-        if (state.isSaveAccount) {
-          await sharedPreferences.setString('api-key', json['api_key']);
+        if (json['phan_quyen'] == base.authList[3]) {
+          if (context.mounted) {
+            showToast(context, 'Không thể đăng nhập', ToastificationType.error);
+          }
+          return;
         }
+        String hashed = BCrypt.hashpw(json['phan_quyen'], BCrypt.gensalt());
+        await sharedPreferences.setString('SSID', hashed);
+        await sharedPreferences.setString('api-key', json['api_key']);
+        await sharedPreferences.setBool('is-saved', state.isSaveAccount);
         router.go('/home');
       }
       state = state.copyWith(isLoading: false);

@@ -4,6 +4,7 @@ import 'package:app_admin/models/can_ho_model.dart';
 import 'package:app_admin/provider/base/base.dart';
 import 'package:app_admin/provider/can_ho_provider.dart';
 import 'package:app_admin/provider/middleware/middle_provider.dart';
+import 'package:bcrypt/bcrypt.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
@@ -152,9 +153,20 @@ class HomeProvider extends StateNotifier<HomeState> {
     final base = ref.read(baseProvider);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? apiKey = sharedPreferences.getString('api-key');
+    String? hashed = sharedPreferences.getString('SSID');
+    String auth = 'sale';
+
+    if (BCrypt.checkpw(base.authList[0], hashed!) ||
+        BCrypt.checkpw(base.authList[2], hashed)) {
+      auth = base.authList[0];
+    }
+
+    if (BCrypt.checkpw(base.authList[1], hashed)) {
+      auth = base.authList[1];
+    }
 
     final response = await http.get(
-      Uri.https(base.baseUrl, '/tim-kiem/admin', {
+      Uri.https(base.baseUrl, '/tim-kiem/$auth', {
         'limit': limit.toString(),
         'offset': offset.toString(),
         ...homeState.toMap(),
@@ -234,6 +246,7 @@ class HomeProvider extends StateNotifier<HomeState> {
   Future<void> logout() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.remove('api-key');
+    await sharedPreferences.remove('is-saved');
   }
 }
 
