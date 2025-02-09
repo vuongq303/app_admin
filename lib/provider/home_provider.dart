@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:app_admin/models/can_ho_model.dart';
 import 'package:app_admin/provider/base/base.dart';
+import 'package:app_admin/provider/can_ho_provider.dart';
+import 'package:app_admin/provider/middleware/middle_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
@@ -12,11 +15,14 @@ class HomeState {
   final String phanQuyen;
   final String? ten_du_an;
   final String? ten_toa_nha;
-  final String? noi_that;
+  final String? loai_noi_that;
   final String? loai_can_ho;
   final String? huong_can_ho;
   final String? so_phong_ngu;
   final String? truc_can_ho;
+  final String? loc_gia;
+  final String? gia_tu;
+  final String? gia_den;
 
   HomeState({
     this.selectedIndex = 0,
@@ -24,11 +30,14 @@ class HomeState {
     this.phanQuyen = '',
     this.ten_du_an = '',
     this.ten_toa_nha = '',
-    this.noi_that = '',
+    this.loai_noi_that = '',
     this.loai_can_ho = '',
     this.huong_can_ho = '',
     this.so_phong_ngu = '',
     this.truc_can_ho = '',
+    this.loc_gia = '',
+    this.gia_tu = '',
+    this.gia_den = '',
   });
 
   HomeState copyWith({
@@ -37,11 +46,14 @@ class HomeState {
     String? phanQuyen,
     String? ten_du_an,
     String? ten_toa_nha,
-    String? noi_that,
+    String? loai_noi_that,
     String? loai_can_ho,
     String? huong_can_ho,
     String? so_phong_ngu,
     String? truc_can_ho,
+    String? loc_gia,
+    String? gia_tu,
+    String? gia_den,
   }) {
     return HomeState(
       selectedIndex: selectedIndex ?? this.selectedIndex,
@@ -49,11 +61,14 @@ class HomeState {
       phanQuyen: phanQuyen ?? this.phanQuyen,
       ten_du_an: ten_du_an ?? this.ten_du_an,
       ten_toa_nha: ten_toa_nha ?? this.ten_toa_nha,
-      noi_that: noi_that ?? this.noi_that,
+      loai_noi_that: loai_noi_that ?? this.loai_noi_that,
       loai_can_ho: loai_can_ho ?? this.loai_can_ho,
       huong_can_ho: huong_can_ho ?? this.huong_can_ho,
       so_phong_ngu: so_phong_ngu ?? this.so_phong_ngu,
       truc_can_ho: truc_can_ho ?? this.truc_can_ho,
+      loc_gia: loc_gia ?? this.loc_gia,
+      gia_tu: gia_tu ?? this.gia_tu,
+      gia_den: gia_den ?? this.gia_den,
     );
   }
 
@@ -61,11 +76,14 @@ class HomeState {
     return {
       'ten_du_an': ten_du_an,
       'ten_toa_nha': ten_toa_nha,
-      'noi_that': noi_that,
+      'loai_noi_that': loai_noi_that,
       'loai_can_ho': loai_can_ho,
       'huong_can_ho': huong_can_ho,
       'so_phong_ngu': so_phong_ngu,
       'truc_can_ho': truc_can_ho,
+      'loc_gia': loc_gia,
+      'gia_tu': gia_tu,
+      'gia_den': gia_den,
     };
   }
 
@@ -73,17 +91,22 @@ class HomeState {
     return HomeState(
       ten_du_an: map['ten_du_an'],
       ten_toa_nha: map['ten_toa_nha'],
-      noi_that: map['noi_that'],
+      loai_noi_that: map['loai_noi_that'],
       loai_can_ho: map['loai_can_ho'],
       huong_can_ho: map['huong_can_ho'],
       so_phong_ngu: map['so_phong_ngu'],
       truc_can_ho: map['truc_can_ho'],
+      loc_gia: map['loc_gia'],
+      gia_tu: map['gia_tu'],
+      gia_den: map['gia_den'],
     );
   }
 }
 
 class HomeProvider extends StateNotifier<HomeState> {
   HomeProvider(this.ref) : super(HomeState());
+  int limit = 50;
+  int offset = 1;
   Logger logger = Logger();
   Ref ref;
 
@@ -125,8 +148,87 @@ class HomeProvider extends StateNotifier<HomeState> {
     state = HomeState();
   }
 
+  Future<Map<String, dynamic>> fetchData(HomeState homeState) async {
+    final base = ref.read(baseProvider);
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? apiKey = sharedPreferences.getString('api-key');
+
+    final response = await http.get(
+      Uri.https(base.baseUrl, '/tim-kiem/admin', {
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+        ...homeState.toMap(),
+      }),
+      headers: {'Cookie': 'TOKEN=$apiKey'},
+    );
+
+    return jsonDecode(response.body);
+  }
+
   Future<void> submitSelection() async {
-    logger.d(state.toMap());
+    final canHoState = ref.read(canHoProvider.notifier);
+    final isHaveDataNotifier = ref.read(isHaveData.notifier);
+
+    if (canHoState.state.isLoading) return;
+
+    isHaveDataNotifier.state = true;
+    try {
+      offset = 1;
+      ref.read(middleProvider.notifier).state = true;
+      canHoState.setLoading();
+
+      final json = await fetchData(state);
+      final status = json['status'];
+
+      if (status) {
+        final List<CanHoModel> listCanHo = List.from(
+          json['data'].map((item) => CanHoModel.fromMap(item)),
+        );
+
+        if (listCanHo.length < limit) {
+          isHaveDataNotifier.state = false;
+        }
+
+        canHoState.setList(listCanHo);
+      }
+    } catch (e, stackTrace) {
+      canHoState.setError(e, stackTrace);
+      logger.e(e);
+    }
+  }
+
+  Future<void> loadMore() async {
+    final isHaveDataNotifier = ref.read(isHaveData.notifier);
+    final canHoState = ref.read(canHoProvider.notifier);
+    final canHoNotifer = ref.read(canHoProvider);
+    if (canHoNotifer.isLoading) return;
+
+    try {
+      offset++;
+
+      final json = await fetchData(state);
+      final status = json['status'];
+
+      if (status) {
+        final List<CanHoModel> listCanHo = List.from(
+          json['data'].map((item) => CanHoModel.fromMap(item)),
+        );
+
+        final List<CanHoModel> updatedList = [
+          ...(canHoNotifer.value ?? []),
+          ...listCanHo
+        ];
+
+        if (listCanHo.length < limit) {
+          isHaveDataNotifier.state = false;
+        }
+
+        canHoState.setList(updatedList);
+      }
+    } catch (e, stackTrace) {
+      logger.e(e);
+      canHoState.setError(e, stackTrace);
+    }
   }
 
   Future<void> logout() async {
@@ -135,9 +237,8 @@ class HomeProvider extends StateNotifier<HomeState> {
   }
 }
 
-final homeProvider = StateNotifierProvider<HomeProvider, HomeState>((ref) {
-  return HomeProvider(ref);
-});
+final homeProvider =
+    StateNotifierProvider<HomeProvider, HomeState>((ref) => HomeProvider(ref));
 
 Future<Map<String, dynamic>> getListMenu(Ref ref) async {
   try {

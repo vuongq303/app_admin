@@ -33,8 +33,8 @@ class LoginScreen extends ConsumerWidget {
                   child: Align(
                     widthFactor: 1,
                     heightFactor: 0.5,
-                    child: Image.network(
-                      'https://connecthome.vn/source/connect_home.png',
+                    child: Image.asset(
+                      'assets/images/connect_home.png',
                       height: 400,
                       fit: BoxFit.cover,
                     ),
