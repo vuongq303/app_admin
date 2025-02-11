@@ -107,7 +107,7 @@ class HomeState {
 class HomeProvider extends StateNotifier<HomeState> {
   HomeProvider(this.ref) : super(HomeState());
   int limit = 50;
-  int offset = 1;
+  int offset = 0;
   Logger logger = Logger();
   Ref ref;
 
@@ -167,8 +167,8 @@ class HomeProvider extends StateNotifier<HomeState> {
 
     final response = await http.get(
       Uri.https(base.baseUrl, '/tim-kiem/$auth', {
-        'limit': limit.toString(),
-        'offset': offset.toString(),
+        'limit': '$limit',
+        'offset': '$offset',
         ...homeState.toMap(),
       }),
       headers: {'Cookie': 'TOKEN=$apiKey'},
@@ -185,7 +185,7 @@ class HomeProvider extends StateNotifier<HomeState> {
 
     isHaveDataNotifier.state = true;
     try {
-      offset = 1;
+      offset = 0;
       ref.read(middleProvider.notifier).state = true;
       canHoState.setLoading();
 

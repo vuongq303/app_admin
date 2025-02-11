@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
   CanHoProvider(this.ref) : super(const AsyncValue.loading());
   int limit = 50;
-  int offset = 1;
+  int offset = 0;
   Logger logger = Logger();
   final Ref ref;
 
@@ -42,8 +42,8 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
 
     final response = await http.get(
       Uri.https(base.baseUrl, '/can-ho', {
-        'limit': limit.toString(),
-        'offset': offset.toString(),
+        'limit': '$limit',
+        'offset': '$offset',
       }),
       headers: {'Cookie': 'TOKEN=$apiKey'},
     );
@@ -82,7 +82,7 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
     ref.read(isHaveData.notifier).state = true;
 
     try {
-      offset = 1;
+      offset = 0;
       ref.watch(middleProvider.notifier).state = false;
       state = const AsyncValue.loading();
 

@@ -26,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
 
     final List<String> drawerMenu = [
       'Data nguồn',
-      'Căn hộ đã gửi',
+      'Căn hộ đã yêu cầu',
       'Căn hộ đã duyệt'
     ];
 
@@ -64,7 +64,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.business_outlined),
-              title: const Text('Data nguồn'),
+              title: Text(drawerMenu[0]),
               onTap: () {
                 homeNotifier.updateState(selectedIndex: 0);
                 Navigator.pop(context);
@@ -72,7 +72,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.send),
-              title: const Text('Căn hộ đã gửi'),
+              title: Text(drawerMenu[1]),
               onTap: () {
                 homeNotifier.updateState(selectedIndex: 1);
                 Navigator.pop(context);
@@ -80,7 +80,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.call_received),
-              title: const Text('Căn hộ đã duyệt'),
+              title: Text(drawerMenu[2]),
               onTap: () {
                 homeNotifier.updateState(selectedIndex: 2);
                 Navigator.pop(context);

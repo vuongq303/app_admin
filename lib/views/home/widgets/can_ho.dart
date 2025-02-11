@@ -65,6 +65,9 @@ class _CanHoState extends ConsumerState<CanHo> {
 
             showModalBottomSheet(
               context: context,
+              isScrollControlled: true,
+              
+              useSafeArea: true,
               builder: (context) {
                 return Padding(
                   padding: const EdgeInsets.all(10),
@@ -78,20 +81,20 @@ class _CanHoState extends ConsumerState<CanHo> {
                     width: double.infinity,
                     child: Column(
                       children: [
+                        Text(
+                          'Tìm kiếm căn hộ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
                         Expanded(
                           child: menuNotifer.when(
                             data: (response) {
                               return SingleChildScrollView(
                                 child: Column(
                                   children: [
-                                    Text(
-                                      'Tìm kiếm căn hộ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -286,7 +289,6 @@ class _CanHoState extends ConsumerState<CanHo> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
                                   ],
                                 ),
                               );
@@ -357,7 +359,6 @@ class _CanHoState extends ConsumerState<CanHo> {
                 onLoadMore: () async {
                   if (isHaveDataState.state) {
                     if (isSearchState.state) {
-                      print('Search');
                       homeNotifier.loadMore();
                       return false;
                     }
