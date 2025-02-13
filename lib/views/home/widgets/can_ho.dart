@@ -37,7 +37,6 @@ class _CanHoState extends ConsumerState<CanHo> {
     final homeState = ref.read(homeProvider);
     final homeNotifier = ref.read(homeProvider.notifier);
     final isSearchState = ref.read(middleProvider.notifier);
-    final isHaveDataState = ref.read(isHaveData.notifier);
     final List<String> listPhongNgu = ['1', '2', '3', '4', '5', '6'];
     final List<String> listGiaCanHo = [
       "Giá bán tăng dần",
@@ -59,14 +58,13 @@ class _CanHoState extends ConsumerState<CanHo> {
                     color: color.bgColor, size: 30),
               ),
             );
-            await Future.delayed(const Duration(milliseconds: 1000));
+            await Future.delayed(const Duration(milliseconds: 500));
             if (!context.mounted) return;
             Navigator.pop(context);
 
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-              
               useSafeArea: true,
               builder: (context) {
                 return Padding(
@@ -289,6 +287,7 @@ class _CanHoState extends ConsumerState<CanHo> {
                                         ),
                                       ],
                                     ),
+                                    const SizedBox(height: 300),
                                   ],
                                 ),
                               );
@@ -332,8 +331,8 @@ class _CanHoState extends ConsumerState<CanHo> {
                                       WidgetStatePropertyAll(color.whColor),
                                 ),
                                 onPressed: () {
-                                  Navigator.of(context).pop();
                                   homeNotifier.resetSelection();
+                                  Navigator.of(context).pop();
                                 },
                                 child: const Text(
                                   'Làm mới',
@@ -354,27 +353,24 @@ class _CanHoState extends ConsumerState<CanHo> {
         ),
         Expanded(
           child: canHoState.when(
-            data: (data) {
-              return LoadMore(
-                onLoadMore: () async {
-                  if (isHaveDataState.state) {
-                    if (isSearchState.state) {
-                      homeNotifier.loadMore();
-                      return false;
-                    }
-                    canHoNotifer.loadMore();
-                  }
-                  return false;
-                },
-                child: ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) => CanHoItem(
-                    canHo: data[index],
-                    index: index,
-                  ),
+            data: (data) => LoadMore(
+              onLoadMore: () async {
+                if (isSearchState.state) {
+                  final loadSearch = await homeNotifier.loadMore();
+                  return loadSearch;
+                }
+
+                final loadCanHo = await canHoNotifer.loadMore();
+                return loadCanHo;
+              },
+              child: ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index) => CanHoItem(
+                  canHo: data[index],
+                  index: index,
                 ),
-              );
-            },
+              ),
+            ),
             error: (error, stackTrace) => const ErrorWidgets(),
             loading: () => Center(
               child: LoadingAnimationWidget.fourRotatingDots(

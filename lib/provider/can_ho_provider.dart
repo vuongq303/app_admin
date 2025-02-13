@@ -10,10 +10,11 @@ import 'package:http/http.dart' as http;
 
 class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
   CanHoProvider(this.ref) : super(const AsyncValue.loading());
-  int limit = 50;
-  int offset = 0;
+  final int limit = 50;
   Logger logger = Logger();
   final Ref ref;
+  int offset = 0;
+  int currentPage = 1;
 
   AsyncValue<List<CanHoModel>> getList() {
     return state;
@@ -51,37 +52,37 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
     return jsonDecode(response.body);
   }
 
-  Future<void> loadMore() async {
-    if (state.isLoading) return;
+  Future<bool> loadMore() async {
+    if (state.isLoading) return false;
 
     final oldData = state.valueOrNull ?? [];
     state = AsyncValue.data([...oldData]);
 
     try {
-      offset++;
+      currentPage++;
+      offset = (currentPage - 1) * limit;
       final json = await fetchData();
       final status = json['status'];
 
-      if (status) {
-        final List<CanHoModel> listCanHo = List.from(
-          json['data'].map((item) => CanHoModel.fromMap(item)),
-        );
-        if (listCanHo.length < limit) {
-          ref.read(isHaveData.notifier).state = false;
-        }
-        state = AsyncValue.data([...oldData, ...listCanHo]);
-        return;
-      }
+      if (!status) return false;
+
+      final listCanHo = List.from(
+        json['data'].map((item) => CanHoModel.fromMap(item)),
+      );
+      if (listCanHo.isEmpty) return false;
+
+      state = AsyncValue.data([...oldData, ...listCanHo]);
+      return true;
     } catch (e, stackTrace) {
       logger.e(e, stackTrace: stackTrace);
       state = AsyncValue.error(e, stackTrace);
+      return false;
     }
   }
 
   Future<void> getData() async {
-    ref.read(isHaveData.notifier).state = true;
-
     try {
+      currentPage = 1;
       offset = 0;
       ref.watch(middleProvider.notifier).state = false;
       state = const AsyncValue.loading();
@@ -90,12 +91,9 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
       final status = json['status'];
 
       if (status) {
-        final List<CanHoModel> listCanHo =
-            List.from(json['data'].map((item) => CanHoModel.fromMap(item)));
-
-        if (listCanHo.length < limit) {
-          ref.read(isHaveData.notifier).state = false;
-        }
+        final List<CanHoModel> listCanHo = List.from(
+          json['data'].map((item) => CanHoModel.fromMap(item)),
+        );
         state = AsyncValue.data(listCanHo);
         return;
       }

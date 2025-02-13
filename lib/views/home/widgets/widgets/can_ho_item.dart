@@ -69,7 +69,7 @@ class CanHoItem extends ConsumerWidget {
           TextBold('- ${canHo.noi_that}'),
           TextBold('- ${canHo.ghi_chu}'),
           TextBold(
-            '- ${canHo.nguoi_cap_nhat} đã cập nhật ngày ${DateFormat("dd/MM/yyyy").format(canHo.ngay_cap_nhat)}',
+            '- ${canHo.nguoi_cap_nhat} đã cập nhật ngày ${DateFormat("dd/MM/yyyy").format(canHo.ngay_cap_nhat.add(Duration(days: 1)))}',
           ),
           const SizedBox(height: 10),
           Wrap(

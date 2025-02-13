@@ -4,7 +4,6 @@ import 'package:app_admin/models/can_ho_model.dart';
 import 'package:app_admin/provider/base/base.dart';
 import 'package:app_admin/provider/can_ho_provider.dart';
 import 'package:app_admin/provider/middleware/middle_provider.dart';
-import 'package:bcrypt/bcrypt.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
@@ -106,17 +105,35 @@ class HomeState {
 
 class HomeProvider extends StateNotifier<HomeState> {
   HomeProvider(this.ref) : super(HomeState());
-  int limit = 50;
+  final int limit = 50;
+  String role = 'Sale';
   int offset = 0;
+  int currentPage = 1;
   Logger logger = Logger();
   Ref ref;
 
   Future<void> loadDataSaved() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    state = state.copyWith(
-      hoTen: prefs.getString('ho-ten') ?? '',
-      phanQuyen: prefs.getString('phan-quyen') ?? '',
-    );
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? apiKey = prefs.getString('api-key');
+      if (apiKey == null) return;
+
+      final base = ref.read(baseProvider);
+      final response = await http.get(
+        Uri.https(base.baseUrl, '/phan-quyen'),
+        headers: {'Cookie': 'TOKEN=$apiKey'},
+      );
+      final json = jsonDecode(response.body);
+      role = json['phan_quyen'];
+      if (json['status']) {
+        state = state.copyWith(
+          hoTen: json['ho_ten'],
+          phanQuyen: json['phan_quyen'],
+        );
+      }
+    } catch (e) {
+      logger.e(e);
+    }
   }
 
   void updateState({int? selectedIndex}) {
@@ -145,7 +162,10 @@ class HomeProvider extends StateNotifier<HomeState> {
     //     List.from(listTenToaNha.map((item) => item['ten_toa_nha'].toString()));
   }
 
-  void resetSelection() {
+  Future<void> resetSelection() async {
+    offset = 0;
+    currentPage = 1;
+    await ref.watch(canHoProvider.notifier).getData();
     state = HomeState();
   }
 
@@ -153,20 +173,9 @@ class HomeProvider extends StateNotifier<HomeState> {
     final base = ref.read(baseProvider);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? apiKey = sharedPreferences.getString('api-key');
-    String? hashed = sharedPreferences.getString('SSID');
-    String auth = 'sale';
-
-    if (BCrypt.checkpw(base.authList[0], hashed!) ||
-        BCrypt.checkpw(base.authList[2], hashed)) {
-      auth = base.authList[0];
-    }
-
-    if (BCrypt.checkpw(base.authList[1], hashed)) {
-      auth = base.authList[1];
-    }
 
     final response = await http.get(
-      Uri.https(base.baseUrl, '/tim-kiem/$auth', {
+      Uri.https(base.baseUrl, '/tim-kiem/$role', {
         'limit': '$limit',
         'offset': '$offset',
         ...homeState.toMap(),
@@ -179,12 +188,11 @@ class HomeProvider extends StateNotifier<HomeState> {
 
   Future<void> submitSelection() async {
     final canHoState = ref.read(canHoProvider.notifier);
-    final isHaveDataNotifier = ref.read(isHaveData.notifier);
 
     if (canHoState.state.isLoading) return;
 
-    isHaveDataNotifier.state = true;
     try {
+      currentPage = 1;
       offset = 0;
       ref.read(middleProvider.notifier).state = true;
       canHoState.setLoading();
@@ -197,10 +205,6 @@ class HomeProvider extends StateNotifier<HomeState> {
           json['data'].map((item) => CanHoModel.fromMap(item)),
         );
 
-        if (listCanHo.length < limit) {
-          isHaveDataNotifier.state = false;
-        }
-
         canHoState.setList(listCanHo);
       }
     } catch (e, stackTrace) {
@@ -209,37 +213,35 @@ class HomeProvider extends StateNotifier<HomeState> {
     }
   }
 
-  Future<void> loadMore() async {
-    final isHaveDataNotifier = ref.read(isHaveData.notifier);
+  Future<bool> loadMore() async {
     final canHoState = ref.read(canHoProvider.notifier);
     final canHoNotifer = ref.read(canHoProvider);
-    if (canHoNotifer.isLoading) return;
+    if (canHoNotifer.isLoading) return false;
 
     try {
-      offset++;
-
+      currentPage++;
+      offset = (currentPage - 1) * limit;
       final json = await fetchData(state);
       final status = json['status'];
 
-      if (status) {
-        final List<CanHoModel> listCanHo = List.from(
-          json['data'].map((item) => CanHoModel.fromMap(item)),
-        );
+      if (!status) return false;
 
-        final List<CanHoModel> updatedList = [
-          ...(canHoNotifer.value ?? []),
-          ...listCanHo
-        ];
+      final List<CanHoModel> listCanHo = List.from(
+        json['data'].map((item) => CanHoModel.fromMap(item)),
+      );
 
-        if (listCanHo.length < limit) {
-          isHaveDataNotifier.state = false;
-        }
+      final List<CanHoModel> updatedList = [
+        ...(canHoNotifer.value ?? []),
+        ...listCanHo
+      ];
 
-        canHoState.setList(updatedList);
-      }
+      if (listCanHo.isEmpty) return false;
+      canHoState.setList(updatedList);
+      return true;
     } catch (e, stackTrace) {
       logger.e(e);
       canHoState.setError(e, stackTrace);
+      return false;
     }
   }
 
