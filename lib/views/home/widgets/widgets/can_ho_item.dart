@@ -176,29 +176,6 @@ class CanHoItem extends ConsumerWidget {
                 ),
                 child: Text('Yêu cầu'),
               ),
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     final listImage = canHo.hinh_anh.split(',');
-              //     if (listImage[0].isEmpty) return;
-              //     final List<String> listImageUrl = List.from(
-              //       listImage.map(
-              //         (img) =>
-              //             Uri.https(base.baseUrl, '/can-ho/${canHo.id}/$img')
-              //                 .toString(),
-              //       ),
-              //     );
-              //     final response = await ref
-              //         .read(downloadImageProvider(listImageUrl).future);
-              //     if (context.mounted) {
-              //       showToast(context, response, ToastificationType.success);
-              //     }
-              //   },
-              //   style: ButtonStyle(
-              //     backgroundColor: WidgetStatePropertyAll(color.blColor),
-              //     foregroundColor: WidgetStatePropertyAll(color.whColor),
-              //   ),
-              //   child: Text('Tải ảnh xuống'),
-              // ),
             ],
           ),
         ],

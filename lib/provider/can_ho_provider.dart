@@ -89,7 +89,7 @@ class CanHoProvider extends StateNotifier<AsyncValue<List<CanHoModel>>> {
 
       final json = await fetchData();
       final status = json['status'];
-
+      ref.read(totalCanHo.notifier).state = json['total'] ?? 0;
       if (status) {
         final List<CanHoModel> listCanHo = List.from(
           json['data'].map((item) => CanHoModel.fromMap(item)),

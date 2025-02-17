@@ -106,7 +106,6 @@ class HomeState {
 class HomeProvider extends StateNotifier<HomeState> {
   HomeProvider(this.ref) : super(HomeState());
   final int limit = 50;
-  String role = 'Sale';
   int offset = 0;
   int currentPage = 1;
   Logger logger = Logger();
@@ -124,7 +123,7 @@ class HomeProvider extends StateNotifier<HomeState> {
         headers: {'Cookie': 'TOKEN=$apiKey'},
       );
       final json = jsonDecode(response.body);
-      role = json['phan_quyen'];
+
       if (json['status']) {
         state = state.copyWith(
           hoTen: json['ho_ten'],
@@ -165,6 +164,7 @@ class HomeProvider extends StateNotifier<HomeState> {
   Future<void> resetSelection() async {
     offset = 0;
     currentPage = 1;
+    ref.read(countCanHo.notifier).state = 0;
     await ref.watch(canHoProvider.notifier).getData();
     state = HomeState();
   }
@@ -175,7 +175,7 @@ class HomeProvider extends StateNotifier<HomeState> {
     String? apiKey = sharedPreferences.getString('api-key');
 
     final response = await http.get(
-      Uri.https(base.baseUrl, '/tim-kiem/$role', {
+      Uri.https(base.baseUrl, '/tim-kiem/can-ho', {
         'limit': '$limit',
         'offset': '$offset',
         ...homeState.toMap(),
@@ -199,6 +199,7 @@ class HomeProvider extends StateNotifier<HomeState> {
 
       final json = await fetchData(state);
       final status = json['status'];
+      ref.read(countCanHo.notifier).state = json['count'] ?? 0;
 
       if (status) {
         final List<CanHoModel> listCanHo = List.from(

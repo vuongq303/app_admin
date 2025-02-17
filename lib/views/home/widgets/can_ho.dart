@@ -46,310 +46,327 @@ class _CanHoState extends ConsumerState<CanHo> {
     ];
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        IconButton(
-          onPressed: () async {
-            showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) => Center(
-                child: LoadingAnimationWidget.fourRotatingDots(
-                    color: color.bgColor, size: 30),
-              ),
-            );
-            await Future.delayed(const Duration(milliseconds: 500));
-            if (!context.mounted) return;
-            Navigator.pop(context);
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () async {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) => Center(
+                    child: LoadingAnimationWidget.fourRotatingDots(
+                        color: color.bgColor, size: 30),
+                  ),
+                );
+                await Future.delayed(const Duration(milliseconds: 500));
+                if (!context.mounted) return;
+                Navigator.pop(context);
 
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              useSafeArea: true,
-              builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(10),
-                        right: Radius.circular(10),
-                      ),
-                    ),
-                    width: double.infinity,
-                    child: Column(
-                      children: [
-                        Text(
-                          'Tìm kiếm căn hộ',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.horizontal(
+                            left: Radius.circular(10),
+                            right: Radius.circular(10),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Expanded(
-                          child: menuNotifer.when(
-                            data: (response) {
-                              return SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Tên dự án',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: homeNotifier
-                                              .tenDuAnUpdateSelection,
-                                          listMenu:
-                                              ref.watch(listTenDuAnProvider),
-                                          value: homeState.ten_du_an,
-                                          title: 'Tên dự án',
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Tên tòa nhà',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Tên tòa nhà'),
-                                          listMenu:
-                                              ref.watch(listToaNhaProvider),
-                                          title: 'Tên tòa nhà',
-                                          value: homeState.ten_toa_nha,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Nội thất',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Nội thất'),
-                                          listMenu:
-                                              ref.watch(listNoiThatProvider),
-                                          title: 'Nội thất',
-                                          value: homeState.loai_noi_that,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Loại căn hộ',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Loại căn hộ'),
-                                          listMenu:
-                                              ref.watch(listLoaiCanHoProvider),
-                                          title: 'Loại căn hộ',
-                                          value: homeState.loai_can_ho,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Hướng ban công',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Hướng ban công'),
-                                          listMenu:
-                                              ref.watch(listHuongCanHoProvider),
-                                          title: 'Hướng ban công',
-                                          value: homeState.huong_can_ho,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Số phòng ngủ',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Số phòng ngủ'),
-                                          listMenu: listPhongNgu,
-                                          title: 'Số phòng ngủ',
-                                          value: homeState.so_phong_ngu,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Trục căn hộ',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Trục căn hộ'),
-                                          listMenu:
-                                              ref.watch(listTrucCanHoProvider),
-                                          title: 'Trục căn hộ',
-                                          value: homeState.truc_can_ho,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Lọc giá',
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        MyDropDown(
-                                          onChange: (value) =>
-                                              homeNotifier.updateSelection(
-                                                  value, 'Lọc giá'),
-                                          listMenu: listGiaCanHo,
-                                          title: 'Lọc giá căn hộ',
-                                          value: homeState.truc_can_ho,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: TextField(
-                                            onChanged: (value) =>
-                                                homeNotifier.updateSelection(
-                                                    value, 'Giá từ'),
-                                            inputFormatters: [
-                                              ThousandsSeparatorInputFormatter()
-                                            ],
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              labelText: "Giá từ",
-                                              border: OutlineInputBorder(),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: TextField(
-                                            onChanged: (value) =>
-                                                homeNotifier.updateSelection(
-                                                    value, 'Giá đến'),
-                                            inputFormatters: [
-                                              ThousandsSeparatorInputFormatter()
-                                            ],
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              labelText: "Đến giá",
-                                              border: OutlineInputBorder(),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 300),
-                                  ],
-                                ),
-                              );
-                            },
-                            error: (error, stackTrace) => ErrorWidgets(),
-                            loading: () =>
-                                LoadingAnimationWidget.fourRotatingDots(
-                              color: color.bgColor,
-                              size: 30,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
+                        width: double.infinity,
+                        child: Column(
                           children: [
+                            Text(
+                              'Tìm kiếm căn hộ',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
                             Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(color.redOrange),
-                                  foregroundColor:
-                                      WidgetStatePropertyAll(color.whColor),
-                                ),
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  await homeNotifier.submitSelection();
+                              child: menuNotifer.when(
+                                data: (response) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Tên dự án',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: homeNotifier
+                                                  .tenDuAnUpdateSelection,
+                                              listMenu: ref
+                                                  .watch(listTenDuAnProvider),
+                                              value: homeState.ten_du_an,
+                                              title: 'Tên dự án',
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Tên tòa nhà',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Tên tòa nhà'),
+                                              listMenu:
+                                                  ref.watch(listToaNhaProvider),
+                                              title: 'Tên tòa nhà',
+                                              value: homeState.ten_toa_nha,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Nội thất',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Nội thất'),
+                                              listMenu: ref
+                                                  .watch(listNoiThatProvider),
+                                              title: 'Nội thất',
+                                              value: homeState.loai_noi_that,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Loại căn hộ',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Loại căn hộ'),
+                                              listMenu: ref
+                                                  .watch(listLoaiCanHoProvider),
+                                              title: 'Loại căn hộ',
+                                              value: homeState.loai_can_ho,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Hướng ban công',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Hướng ban công'),
+                                              listMenu: ref.watch(
+                                                  listHuongCanHoProvider),
+                                              title: 'Hướng ban công',
+                                              value: homeState.huong_can_ho,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Số phòng ngủ',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Số phòng ngủ'),
+                                              listMenu: listPhongNgu,
+                                              title: 'Số phòng ngủ',
+                                              value: homeState.so_phong_ngu,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Trục căn hộ',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Trục căn hộ'),
+                                              listMenu: ref
+                                                  .watch(listTrucCanHoProvider),
+                                              title: 'Trục căn hộ',
+                                              value: homeState.truc_can_ho,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Lọc giá',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                            MyDropDown(
+                                              onChange: (value) =>
+                                                  homeNotifier.updateSelection(
+                                                      value, 'Lọc giá'),
+                                              listMenu: listGiaCanHo,
+                                              title: 'Lọc giá căn hộ',
+                                              value: homeState.truc_can_ho,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                onChanged: (value) =>
+                                                    homeNotifier
+                                                        .updateSelection(
+                                                            value, 'Giá từ'),
+                                                inputFormatters: [
+                                                  ThousandsSeparatorInputFormatter()
+                                                ],
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  labelText: "Giá từ",
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: TextField(
+                                                onChanged: (value) =>
+                                                    homeNotifier
+                                                        .updateSelection(
+                                                            value, 'Giá đến'),
+                                                inputFormatters: [
+                                                  ThousandsSeparatorInputFormatter()
+                                                ],
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  labelText: "Đến giá",
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 300),
+                                      ],
+                                    ),
+                                  );
                                 },
-                                child: const Text(
-                                  'Tìm kiếm',
-                                  style: TextStyle(fontSize: 15),
+                                error: (error, stackTrace) => ErrorWidgets(),
+                                loading: () =>
+                                    LoadingAnimationWidget.fourRotatingDots(
+                                  color: color.bgColor,
+                                  size: 30,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStatePropertyAll(color.bgColor),
-                                  foregroundColor:
-                                      WidgetStatePropertyAll(color.whColor),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(
+                                          color.redOrange),
+                                      foregroundColor:
+                                          WidgetStatePropertyAll(color.whColor),
+                                    ),
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
+                                      await homeNotifier.submitSelection();
+                                    },
+                                    child: const Text(
+                                      'Tìm kiếm',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
                                 ),
-                                onPressed: () {
-                                  homeNotifier.resetSelection();
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  'Làm mới',
-                                  style: TextStyle(fontSize: 15),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStatePropertyAll(color.bgColor),
+                                      foregroundColor:
+                                          WidgetStatePropertyAll(color.whColor),
+                                    ),
+                                    onPressed: () {
+                                      homeNotifier.resetSelection();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      'Làm mới',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-          icon: Icon(Icons.filter_alt_outlined, size: 25),
+              icon: Icon(Icons.filter_alt_outlined, size: 25),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                'Có ${ref.read(countCanHo)}/${ref.read(totalCanHo)} kết quả phù hợp',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
         Expanded(
           child: canHoState.when(
