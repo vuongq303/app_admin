@@ -108,6 +108,7 @@ class HomeProvider extends StateNotifier<HomeState> {
   final int limit = 50;
   int offset = 0;
   int currentPage = 1;
+  String role = 'Sale';
   Logger logger = Logger();
   Ref ref;
 
@@ -123,6 +124,7 @@ class HomeProvider extends StateNotifier<HomeState> {
         headers: {'Cookie': 'TOKEN=$apiKey'},
       );
       final json = jsonDecode(response.body);
+      role = json['phan_quyen'] ?? 'Sale';
 
       if (json['status']) {
         state = state.copyWith(
@@ -175,7 +177,8 @@ class HomeProvider extends StateNotifier<HomeState> {
     String? apiKey = sharedPreferences.getString('api-key');
 
     final response = await http.get(
-      Uri.https(base.baseUrl, '/tim-kiem/can-ho', {
+      Uri.https(base.baseUrl,
+          '/tim-kiem/${base.authList[0] == role ? 'admin' : 'sale'}', {
         'limit': '$limit',
         'offset': '$offset',
         ...homeState.toMap(),
